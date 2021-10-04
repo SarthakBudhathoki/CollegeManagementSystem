@@ -1,0 +1,185 @@
+from tkinter import *
+from tkinter import  messagebox
+from PIL import Image, ImageTk
+from tkinter import ttk
+import Backend.dbconnection
+
+
+class Course:
+    def __init__(self,project):
+        self.project=project
+        self.project.title("Courses")
+        self.project.geometry("1300x498+0+280")
+        self.project.focus_force()
+        self.db=Backend.dbconnection.Database()
+        self.coursename=StringVar()
+        self.duration=StringVar()
+        self.coursecredit = StringVar()
+        self.charges = StringVar()
+        self.coursehead = StringVar()
+        self.description = StringVar()
+        self.courseid = StringVar()
+
+        #>>>>>>>>>>>>>>>>> Title >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        title = Label(self.project, text="Course", compound=LEFT,font=("goudy old style", 30, "bold"), bg="#363e45", fg="Yellow")
+        title.place(x=0, y=0, relwidth=1, height=50)
+
+        #>>>>>>>>>>>>>>>>>>>>>>>Subtitle and Button <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+        course_name_label=Label(self.project,text="Course Name",font=("goudy old style",15,"bold"),fg="#7307f7")
+        course_name_label.place(x=0,y=80)
+
+        self.cname=Entry(self.project,textvar=self.coursename, font=("goudy old style", 15, "bold"), bg="white").place(x=130, y=83)
+
+        duration_name_label = Label(self.project, text="Duration", font=("goudy old style", 15, "bold"), fg="#7307f7")
+        duration_name_label.place(x=0, y=120)
+
+        self.duration_entry = Entry(self.project,textvar=self.duration, font=("goudy old style", 15, "bold"), bg="white").place(x=130, y=120)
+
+        coursecredit_name_label = Label(self.project, text="Course Credit", font=("goudy old style", 15, "bold"), fg="#7307f7")
+        coursecredit_name_label.place(x=0, y=160)
+
+        self.credit_entry = Entry(self.project, textvar=self.coursecredit, font=("goudy old style", 15, "bold"), bg="white").place(x=130, y=157)
+
+        charges_name_label = Label(self.project, text="Charges", font=("goudy old style", 15, "bold"), fg="#7307f7")
+        charges_name_label.place(x=0, y=200)
+
+        self.charges_entry = Entry(self.project,textvar=self.charges, font=("goudy old style", 15, "bold"), bg="white").place(x=130, y=198)
+
+        description_name_label = Label(self.project, text="Description", font=("goudy old style", 15, "bold"), fg="#7307f7")
+        description_name_label.place(x=0, y=280)
+
+        self.description_entry = Entry(self.project, textvar=self.description,font=("goudy old style", 15, "bold"), bg="white").place(x=130, y=275)
+
+        coursehead_name_label = Label(self.project, text="Course Head", font=("goudy old style", 15, "bold"), fg="#7307f7")
+        coursehead_name_label.place(x=0, y=240)
+
+        self.head_entry = Entry(self.project,textvar=self.coursehead, font=("goudy old style", 15, "bold"), bg="white").place(x=130, y=238)
+
+        self.courseid_entry=Entry(self.project,textvar=self.courseid,show=".", font=("goudy old style" ,1), bg="#325270",relief="flat").place(x=0, y=-5)
+
+        self.mainframe=Frame(self.project,bg="white",bd=4,relief="groove")
+        self.mainframe.place(x=550,y=55,height=310,width=720)
+
+
+        scroll_x = Scrollbar(self.mainframe, orient=HORIZONTAL)
+        scroll_y = Scrollbar(self.mainframe, orient=VERTICAL)
+        self.course_table = ttk.Treeview(self.mainframe, columns=(
+            'Course Id','Course Name', 'Duration', 'Course Credit', 'Charges', 'Course Head','Description'), xscrollcommand=scroll_x.set,yscrollcommand=scroll_y.set)
+        scroll_x.pack(side=BOTTOM, fill=X)
+        scroll_y.pack(side=RIGHT, fill=Y)
+        scroll_x.config(command=self.course_table.xview)
+        scroll_y.config(command=self.course_table.yview)
+        self.course_table.heading('Course Id',text='Course Id')
+        self.course_table.heading('Course Name', text='Course Name')
+        self.course_table.heading('Duration', text='Duration')
+        self.course_table.heading('Course Credit', text='Course Credit')
+        self.course_table.heading('Charges', text='Charges')
+        self.course_table.heading('Course Head', text='Course Head')
+        self.course_table.heading('Description', text='Description')
+        self.course_table['show'] = 'headings'
+        self.course_table.pack(fill=BOTH, expand=TRUE)
+        self.course_table.pack()
+        self.course_table.bind("<ButtonRelease-1>", self.cursor)
+        self.fetchdata()
+
+
+        self.btn_clear = Button(self.project, text="Clear",command=self.clear, font=("times new roman", 15), bg="Gray", fg="white")
+        self.btn_clear.place(x=395, y=325, height=30, width=120)
+        #
+        self.btn_update = Button(self.project,command=self.update_course, text="Update", font=("times new roman", 15), bg="Gray", fg="white")
+        self.btn_update.place(x=135, y=325, height=30, width=120)
+
+        self.btn_delete = Button(self.project, text="Delete",command=self.deletedata, font=("times new roman", 15), bg="Gray", fg="white")
+        self.btn_delete.place(x=265, y=325, height=30, width=120)
+
+        self.btn_add = Button(self.project, command=self.addcourse,text="Add", font=("times new roman", 15), bg="Gray", fg="white")
+        self.btn_add.place(x=5, y=325, height=30, width=120)
+
+    def fetchdata(self):
+       query='select * from new_table '
+       fetch_data=self.db.fetch_all(query)
+
+       if len(fetch_data) != 0:
+            self.course_table.delete(*self.course_table.get_children())
+       for row in fetch_data:
+            self.course_table.insert('', END, values=row)
+
+
+
+    def addcourse(self):
+        coursename = self.coursename.get()
+        duration =  self.duration.get()
+        coursecredit = self.coursecredit.get()
+        charges = self.charges.get()
+        coursehead = self.coursehead.get()
+        description = self.description.get()
+
+        if coursename=='' or duration=='' or coursehead=='' or charges=='' or coursecredit=='' or description=='':
+                messagebox.showerror("error","All field are required for add course")
+        else:
+            query="select * from new_table where course_name=%s"
+            values=(coursename,)
+            row=self.db.fetch(query,values)
+        if row !=None:
+            messagebox.showerror("error","Course name is already present",parent=self.project)
+        else:
+            queryone="Insert into new_table(course_name,duration,course_credit,charges,course_head,description) values(%s,%s,%s,%s,%s,%s)"
+            value=(coursename,duration,coursecredit,charges,coursehead,description)
+            self.db.add(queryone,value)
+            messagebox.showinfo("Success", "data add successfully",parent=self.project)
+            self.fetchdata()
+            self.clear()
+
+
+
+    def cursor(self,a):
+        coursor_row = self.course_table.focus()
+        data = self.course_table.item(coursor_row)
+        row = data['values']
+        self.courseid.set(row[0])
+        self.coursename.set(row[1])
+        self.duration.set(row[2])
+        self.coursecredit.set(row[3])
+        self.charges.set(row[4])
+        self.coursehead.set(row[5])
+        self.description.set(row[6])
+
+    def update_course(self):
+        coursename = self.coursename.get()
+        duration = self.duration.get()
+        coursecredit = self.coursecredit.get()
+        charges = self.charges.get()
+        coursehead = self.coursehead.get()
+        description = self.description.get()
+        courseid= self.courseid.get()
+        query="update new_table set course_name=%s,duration =%s, course_credit=%s, charges=%s, course_head=%s, description=%s where id=%s"
+        value=(coursename,duration,coursecredit,charges,coursehead,description,courseid)
+        self.db.update(query,value)
+        messagebox.showinfo("Success","Successfully update data",parent=self.project)
+        self.fetchdata()
+
+    def deletedata(self):
+        courseid = self.courseid.get()
+        query="delete from new_table where id=%s"
+        values=courseid,
+        self.db.delete(query,values)
+        self.fetchdata()
+        messagebox.showinfo("success","Data  successfully deleted",parent=self.project)
+
+
+    def clear(self):
+        self.courseid.set("")
+        self.coursename.set("")
+        self.duration.set("")
+        self.coursecredit.set("")
+        self.charges.set("")
+        self.coursehead.set("")
+        self.description.set("")
+
+
+
+if __name__=="__main__":
+    tk=Tk()
+    obj=Course(tk)
+    tk.mainloop()
