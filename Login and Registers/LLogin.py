@@ -1,15 +1,18 @@
+Ishwor Khadka
 from tkinter import *
 from tkinter import messagebox
 from PIL import Image, ImageTk
 from tkinter import ttk
-#import Frontend.Dashboard
+import Frontend.Dashboard
 
 class login_system:
     def __init__(self, project):
         self.project = project
         self.project.geometry("1900x1500+0+0")
 
-
+        self.background_image = ImageTk.PhotoImage(Image.open("C:/Users/DELL/PycharmProjects/pythonProject26/image/22.png"))
+        back_ground_label = Label(self.project, image=self.background_image)
+        back_ground_label.pack()
         login_system_frame = Frame(self.project, bg="white")
         login_system_frame.place(x=120, y=100, height=500, width=600)
 
@@ -28,6 +31,9 @@ class login_system:
         username_seperator=ttk.Separator(login_system_frame,orient='horizontal')
         username_seperator.place(x=190,y=220,width=240)
 #>>>>>>>>>>>>>>>>>>>>>password<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#
+        self.password_image = ImageTk.PhotoImage(Image.open("C:/Users/DELL/PycharmProjects/pythonProject26/image/password.png"))
+        back_ground_label = Label(login_system_frame, bg='white',image=self.password_image)
+        back_ground_label.place(x=188,y=280)
 
         password = Label(login_system_frame, text="Password", bd=0, fg='Black', bg='white', font=("Arial bold", 14))
         password.place(x=190, y=240)
@@ -47,7 +53,7 @@ class login_system:
             messagebox.showinfo("Info",f" Welcome {self.username_entry.get()} and your password is: {self.password_entry.get()}")
             self.project.destroy()
             self.new=Tk()
-            #self.w1=Frontend.Dashboard.Dashboard(self.new)
+            self.w1=Frontend.Dashboard.Dashboard(self.new)
 
         else:
             messagebox.showerror("Error","Invalid username or password")
